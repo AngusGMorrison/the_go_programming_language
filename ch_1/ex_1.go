@@ -1,13 +1,14 @@
-// Echo: prints its command line arguments
+// Modify the echo program to also print os.Args[0], the name of the command
+// that invoked it.
 
 package main
 
 import (
 	"fmt"
-	"os",
+	"os"
 	"strings"
 )
 
 func main() {
-	fmt.Println(srings.Join(os.Args, " "))
+	fmt.Println(strings.Join(os.Args, " "))
 }
