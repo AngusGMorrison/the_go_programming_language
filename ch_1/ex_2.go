@@ -4,10 +4,11 @@ package main
 
 import (
 	"fmt"
-	"os",
-	"strings"
+	"os"
 )
 
 func main() {
-	fmt.Println(srings.Join(os.Args, " "))
+	for i, arg := range os.Args {
+		fmt.Printf("%d %s\n", i, arg)
+	}
 }
