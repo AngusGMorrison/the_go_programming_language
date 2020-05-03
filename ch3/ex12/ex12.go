@@ -5,25 +5,26 @@ the same letters in a different order.
 
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"unicode"
+)
 
 func main() {
-	fmt.Println(isAnagram("babcock♛", "kcaob♛cb"))
+	fmt.Println(isAnagram("babcock♛", "Abbcck♛o"))
 }
 
 func isAnagram(s, t string) bool {
 	if len(s) != len(t) {
 		return false
 	}
+
 	var total rune
 	for _, r := range s {
-		total += r
+		total += unicode.ToLower(r)
 	}
 	for _, r := range t {
-		total -= r
+		total -= unicode.ToLower(r)
 	}
-	if total == 0 {
-		return true
-	}
-	return false
+	return total == 0
 }
