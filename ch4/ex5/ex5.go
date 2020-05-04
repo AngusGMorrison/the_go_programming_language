@@ -9,23 +9,25 @@ import "fmt"
 func main() {
 	strings := []string{
 		"hello",
+		"hello",
+		"hello",
 		"hi",
 		"hello",
 		"howdy",
 		"hello",
+		"hello",
 	}
-	fmt.Println(dedup(strings))
+	fmt.Println(removeAdjacentDups(strings))
 }
 
-func dedup(strings []string) []string {
-	i := 0
-	seen := make(map[string]bool)
-	for _, s := range strings {
-		if !seen[s] {
-			seen[s] = true
-			strings[i] = s
+func removeAdjacentDups(s []string) []string {
+	// Iterate over all characters in the slice except the last one
+	for i := 0; i < len(s)-1; {
+		if s[i] == s[i+1] {
+			s = append(s[:i], s[i+1:]...)
+		} else {
 			i++
 		}
 	}
-	return strings[:i]
+	return s
 }
