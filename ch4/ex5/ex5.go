@@ -12,6 +12,7 @@ func main() {
 		"hello",
 		"hello",
 		"hi",
+		"hi",
 		"hello",
 		"howdy",
 		"hello",
