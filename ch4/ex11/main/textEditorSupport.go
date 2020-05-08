@@ -1,5 +1,5 @@
 /*
-create.go contains functions supporting the creation of new GitHub issues.
+textEditorSupport contains functions supporting the creation of new GitHub issues.
 */
 
 package main
