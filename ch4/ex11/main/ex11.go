@@ -3,18 +3,6 @@ Build a tool that lets users create, read, update and close GitHub issues from t
 invoking their peferred text editor when substantial text input is required.
 */
 
-// Read: ./ex11 read owner repo issue
-// GET
-
-// Create: ./ex11 create owner repo
-// POST
-
-// Update: ./ex11 update owner repo issue
-// PATCH
-
-// Close: ./ex11 close owner repo issue
-// PATCH state: closed
-
 package main
 
 import (
@@ -43,21 +31,58 @@ func main() {
 
 	action, owner, repo := os.Args[1], os.Args[2], os.Args[3]
 	switch action {
+	case create:
+		createIssue(owner, repo)
 	case read:
-		issue, err := github.ReadIssue(owner, repo, os.Args[4])
-		if err != nil {
-			log.Fatal(err)
-		}
-		printIssueDetails(issue)
+		readIssue(owner, repo, os.Args[4])
+	case update:
+		updateIssue(owner, repo, os.Args[4])
 	case close:
-		issue, err := github.CloseIssue(owner, repo, os.Args[4])
-		if err != nil {
-			log.Fatal(err)
-		}
-		printIssueDetails(issue)
+		closeIssue(owner, repo, os.Args[4])
 	default:
 		log.Fatalf("Unknown action %q. Valid actions are create, read, update, close", action)
 	}
+}
+
+func createIssue(owner, repo string) {
+	draft, err := getNewIssueDetails()
+	if err != nil {
+		log.Fatal(err)
+	}
+	issue, err := github.CreateIssue(owner, repo, draft)
+	if err != nil {
+		log.Fatal(err)
+	}
+	printIssueDetails(issue)
+}
+
+func readIssue(owner, repo, issueNum string) {
+	issue, err := github.ReadIssue(owner, repo, os.Args[4])
+	if err != nil {
+		log.Fatal(err)
+	}
+	printIssueDetails(issue)
+}
+
+func updateIssue(owner, repo, issueNum string) {
+	issue, err := github.ReadIssue(owner, repo, os.Args[4])
+	if err != nil {
+		log.Fatal(err)
+	}
+	draft, err := getUpdatedIssueDetails(issue)
+	issue, err = github.UpdateIssue(owner, repo, issueNum, draft)
+	if err != nil {
+		log.Fatal(err)
+	}
+	printIssueDetails(issue)
+}
+
+func closeIssue(owner, repo, issueNum string) {
+	issue, err := github.CloseIssue(owner, repo, os.Args[4])
+	if err != nil {
+		log.Fatal(err)
+	}
+	printIssueDetails(issue)
 }
 
 func printIssueDetails(issue *github.Issue) {

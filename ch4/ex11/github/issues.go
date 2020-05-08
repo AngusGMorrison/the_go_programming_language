@@ -8,7 +8,27 @@ import (
 	"os"
 )
 
-// ReadIssue queries the Github API for details of a known issue.
+// CreateIssue POSTs a draft issue to the GitHub API and returns the created issue
+func CreateIssue(owner, repo string, draft *Issue) (*Issue, error) {
+	url := fmt.Sprintf(repoURL, owner, repo)
+	resp, err := ajax(url, "POST", draft)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusCreated {
+		return nil, fmt.Errorf("CreateIssue failed: %s", resp.Status)
+	}
+
+	issue := Issue{}
+	if err = json.NewDecoder(resp.Body).Decode(&issue); err != nil {
+		return nil, err
+	}
+	return &issue, nil
+}
+
+// ReadIssue queries the GitHub API for details of a known issue.
 func ReadIssue(owner, repo, issueNum string) (*Issue, error) {
 	url := fmt.Sprintf(issueURL, owner, repo, issueNum)
 	resp, err := http.Get(url)
@@ -30,22 +50,43 @@ func ReadIssue(owner, repo, issueNum string) (*Issue, error) {
 	return &issue, nil
 }
 
+// UpdateIssue updates the specified issue via the GitHub API
+func UpdateIssue(owner, repo, issueNum string, draft *Issue) (*Issue, error) {
+	url := fmt.Sprintf(issueURL, owner, repo, issueNum)
+	resp, err := ajax(url, "PATCH", draft)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("UpdateIssue failed: %s", resp.Status)
+	}
+
+	var issue Issue
+	if err = json.NewDecoder(resp.Body).Decode(&issue); err != nil {
+		return nil, err
+	}
+	return &issue, nil
+}
+
 // CloseIssue closes the specified issue via the GitHub API
 func CloseIssue(owner, repo, issueNum string) (*Issue, error) {
 	url := fmt.Sprintf(issueURL, owner, repo, issueNum)
-	issue := Issue{State: "closed"}
+	draft := Issue{State: "closed"}
 
-	resp, err := patch(url, &issue)
+	resp, err := ajax(url, "PATCH", &draft)
 	if err != nil {
 		return nil, err
 	}
 
 	if resp.StatusCode != http.StatusOK {
 		resp.Body.Close()
-		return nil, fmt.Errorf("close issue failed: %v", resp.Status)
+		return nil, fmt.Errorf("CloseIssue failed: %s", resp.Status)
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(&issue); err != nil {
+	issue := Issue{}
+	if err = json.NewDecoder(resp.Body).Decode(&issue); err != nil {
 		resp.Body.Close()
 		return nil, err
 	}
@@ -53,22 +94,19 @@ func CloseIssue(owner, repo, issueNum string) (*Issue, error) {
 	return &issue, nil
 }
 
-func patch(url string, issue *Issue) (*http.Response, error) {
-	payload, err := json.MarshalIndent(*issue, "", "    ")
-	fmt.Printf("%s", payload)
+func ajax(url, method string, draft *Issue) (*http.Response, error) {
+	payload, err := json.Marshal(draft)
 	if err != nil {
-		return nil, fmt.Errorf("JSON marshaling failed in CloseIssue: %s", err)
+		return nil, fmt.Errorf("JSON marshaling failed in ajax: %s", err)
 	}
-
-	req, err := http.NewRequest("PATCH", url, bytes.NewBuffer(payload))
+	req, err := http.NewRequest(method, url, bytes.NewBuffer(payload))
 	if err != nil {
-		return nil, fmt.Errorf("Request creation failed in CloseIssue: %s", err)
+		return nil, fmt.Errorf("Request creation failed in ajax: %s", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.SetBasicAuth(os.Getenv("GITHUB_USER"), os.Getenv("GOPL_GITHUB_ACCESS_TOKEN"))
 
-	client := http.Client{}
-	resp, err := client.Do(req)
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
