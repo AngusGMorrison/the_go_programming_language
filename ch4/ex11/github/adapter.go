@@ -1,3 +1,5 @@
+// Adapter handles GitHub CRUD API calls
+
 package github
 
 import (
@@ -8,8 +10,8 @@ import (
 	"os"
 )
 
-// CreateIssue POSTs a draft issue to the GitHub API and returns the created issue
-func CreateIssue(owner, repo string, draft *Issue) (*Issue, error) {
+// SendCreateRequest POSTs a draft issue to the GitHub API and returns the created issue
+func SendCreateRequest(owner, repo string, draft *Issue) (*Issue, error) {
 	url := fmt.Sprintf(repoURL, owner, repo)
 	resp, err := ajax(url, "POST", draft)
 	if err != nil {
@@ -28,8 +30,8 @@ func CreateIssue(owner, repo string, draft *Issue) (*Issue, error) {
 	return &issue, nil
 }
 
-// ReadIssue queries the GitHub API for details of a known issue.
-func ReadIssue(owner, repo, issueNum string) (*Issue, error) {
+// SendReadRequest queries the GitHub API for details of a known issue.
+func SendReadRequest(owner, repo, issueNum string) (*Issue, error) {
 	url := fmt.Sprintf(issueURL, owner, repo, issueNum)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -50,8 +52,8 @@ func ReadIssue(owner, repo, issueNum string) (*Issue, error) {
 	return &issue, nil
 }
 
-// UpdateIssue updates the specified issue via the GitHub API
-func UpdateIssue(owner, repo, issueNum string, draft *Issue) (*Issue, error) {
+// SendUpdateRequest updates the specified issue via the GitHub API
+func SendUpdateRequest(owner, repo, issueNum string, draft *Issue) (*Issue, error) {
 	url := fmt.Sprintf(issueURL, owner, repo, issueNum)
 	resp, err := ajax(url, "PATCH", draft)
 	if err != nil {
@@ -70,8 +72,8 @@ func UpdateIssue(owner, repo, issueNum string, draft *Issue) (*Issue, error) {
 	return &issue, nil
 }
 
-// CloseIssue closes the specified issue via the GitHub API
-func CloseIssue(owner, repo, issueNum string) (*Issue, error) {
+// SendCloseRequest closes the specified issue via the GitHub API
+func SendCloseRequest(owner, repo, issueNum string) (*Issue, error) {
 	url := fmt.Sprintf(issueURL, owner, repo, issueNum)
 	draft := Issue{State: "closed"}
 

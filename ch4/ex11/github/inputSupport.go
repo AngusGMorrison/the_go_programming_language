@@ -1,8 +1,6 @@
-/*
-textEditorSupport contains functions supporting the creation of new GitHub issues.
-*/
+// InputSupport contains functions supporting the creation of new GitHub issues.
 
-package main
+package github
 
 import (
 	"bufio"
@@ -11,7 +9,6 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"the_go_programming_language/ch4/ex11/github"
 )
 
 const (
@@ -20,7 +17,7 @@ const (
 )
 
 // getIssueDetails gets the title and body of the new issue from the user
-func getNewIssueDetails() (*github.Issue, error) {
+func getNewIssueDetails() (*Issue, error) {
 	// Collect the issue title via the terminal
 	scanner := bufio.NewScanner(os.Stdin)
 	fmt.Print("Enter an issue title: ")
@@ -35,7 +32,7 @@ func getNewIssueDetails() (*github.Issue, error) {
 	}
 	fmt.Println(body)
 
-	issue := github.Issue{
+	issue := Issue{
 		Title: title,
 		Body:  body,
 	}
@@ -43,7 +40,7 @@ func getNewIssueDetails() (*github.Issue, error) {
 }
 
 // getUpdatedIssueDetails prompts the user to edit the title and body of an exiting issue
-func getUpdatedIssueDetails(current *github.Issue) (*github.Issue, error) {
+func getUpdatedIssueDetails(current *Issue) (*Issue, error) {
 	scanner := bufio.NewScanner(os.Stdin)
 	fmt.Printf("Title: %s\n", current.Title)
 	fmt.Print("Enter new title (leave blank for unchanged): ")
@@ -61,7 +58,7 @@ func getUpdatedIssueDetails(current *github.Issue) (*github.Issue, error) {
 	}
 	fmt.Println(body)
 
-	issue := github.Issue{
+	issue := Issue{
 		Title: title,
 		Body:  body,
 	}
