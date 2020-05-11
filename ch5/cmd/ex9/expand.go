@@ -12,7 +12,9 @@ func main() {
 }
 
 func expand(s string, f func(string) string) string {
+	// Cheaty version
 	// return strings.ReplaceAll(s, "$foo", f("foo"))
+
 	const (
 		substr    = "$foo"
 		substrLen = len(substr)
