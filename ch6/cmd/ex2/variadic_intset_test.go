@@ -5,7 +5,9 @@ import "testing"
 const errorFmt = "Expected %v, got %v"
 
 func createTestSet() *IntSet {
-	return &IntSet{[]uint64{3, 2, 1}}
+	set := IntSet{}
+	set.AddAll(1, 2, 3)
+	return &set
 }
 
 func TestLen(t *testing.T) {
