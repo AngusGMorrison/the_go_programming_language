@@ -9,9 +9,8 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/ch4/ex11/main/ex11.go",
+            "program": "${workspaceFolder}/ch7/cmd/ex5",
             "env": {},
-            "console": "integratedTerminal",
             "args": ["<", "create", "angusgmorrison", "the_go_programming_language"]
         }
     ]
