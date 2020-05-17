@@ -7,15 +7,14 @@ package main
 import (
 	"fmt"
 	"the_go_programming_language/ch7/cmd/ex8/track"
-	"time"
 )
 
 var tracks = []*track.Track{
-	{"Go", "Delilah", "From the Roots Up", 2012, length("3m38s")},
-	{"Go", "Moby", "Made Up", 2018, length("2m21s")},
-	{"Go", "Moby", "Moby", 1992, length("3m37s")},
-	{"Go Ahead", "Alicia Keys", "As I Am", 2007, length("4m36s")},
-	{"Ready 2 Go", "Martin Solveig", "Smash", 2011, length("4m24s")},
+	{"Go", "Delilah", "From the Roots Up", 2012, track.Length("3m38s")},
+	{"Go", "Moby", "Made Up", 2018, track.Length("2m21s")},
+	{"Go", "Moby", "Moby", 1992, track.Length("3m37s")},
+	{"Go Ahead", "Alicia Keys", "As I Am", 2007, track.Length("4m36s")},
+	{"Ready 2 Go", "Martin Solveig", "Smash", 2011, track.Length("4m24s")},
 }
 
 func main() {
@@ -35,14 +34,6 @@ func main() {
 	sortOrder = []string{"Artist", "Year", "Length"}
 	track.SortBy(tracks, sortOrder)
 	printTracks()
-}
-
-func length(s string) time.Duration {
-	d, err := time.ParseDuration(s)
-	if err != nil {
-		panic(s)
-	}
-	return d
 }
 
 func printTracks() {

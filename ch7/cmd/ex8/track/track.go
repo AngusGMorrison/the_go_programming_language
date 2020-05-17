@@ -21,9 +21,9 @@ type multiSort struct {
 	lessOrEqual func(x, y *Track, cols []string) bool
 }
 
-func (x TrackMultiSort) Len() int           { return len(x.t) }
-func (x TrackMultiSort) Less(i, j int) bool { return x.lessOrEqual(x.t[i], x.t[j], x.cols) }
-func (x TrackMultiSort) Swap(i, j int)      { x.t[i], x.t[j] = x.t[j], x.t[i] }
+func (x multiSort) Len() int           { return len(x.t) }
+func (x multiSort) Less(i, j int) bool { return x.lessOrEqual(x.t[i], x.t[j], x.cols) }
+func (x multiSort) Swap(i, j int)      { x.t[i], x.t[j] = x.t[j], x.t[i] }
 
 // SortBy sorts tracks by the fields named in cols, in order of precedence. I.e. cols[0] is the
 // primary sort field, cols[1] the secondary, and so on.
@@ -48,4 +48,12 @@ func SortBy(tracks []*Track, cols []string) {
 		}
 		return false
 	}})
+}
+
+func Length(s string) time.Duration {
+	d, err := time.ParseDuration(s)
+	if err != nil {
+		panic(s)
+	}
+	return d
 }
