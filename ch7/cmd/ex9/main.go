@@ -10,17 +10,13 @@ import (
 	"the_go_programming_language/ch7/cmd/ex8/track"
 )
 
-type trackListing struct {
-	Tracks []*track.Track
-}
-
-var tableData = trackListing{[]*track.Track{
+var tableData = []*track.Track{
 	{"Go", "Delilah", "From the Roots Up", 2012, track.Length("3m38s")},
 	{"Go", "Moby", "Made Up", 2018, track.Length("2m21s")},
 	{"Go", "Moby", "Moby", 1992, track.Length("3m37s")},
 	{"Go Ahead", "Alicia Keys", "As I Am", 2007, track.Length("4m36s")},
 	{"Ready 2 Go", "Martin Solveig", "Smash", 2011, track.Length("4m24s")},
-}}
+}
 
 const templ = `<html lang="en">
 <head></head>
@@ -36,7 +32,7 @@ const templ = `<html lang="en">
 			</tr>
 		</thead>
 		<tbody>
-		 {{range .Tracks}}
+		 {{range .}}
 			 <tr>
 				 <td>{{.Title}}</td>
 				 <td>{{.Artist}}</td>
@@ -66,7 +62,7 @@ func handleSort(w http.ResponseWriter, r *http.Request) {
 	if ok {
 		sortOn[1], sortOn[0] = sortOn[0], sortKey[0]
 	}
-	track.SortBy(tableData.Tracks, sortOn)
+	track.SortBy(tableData, sortOn)
 	if err := table.Execute(w, tableData); err != nil {
 		log.Fatal(err)
 	}

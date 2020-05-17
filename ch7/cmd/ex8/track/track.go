@@ -1,6 +1,7 @@
 package track
 
 import (
+	"fmt"
 	"sort"
 	"time"
 )
@@ -30,23 +31,19 @@ func (x multiSort) Swap(i, j int)      { x.t[i], x.t[j] = x.t[j], x.t[i] }
 func SortBy(tracks []*Track, cols []string) {
 	sort.Sort(multiSort{tracks, cols, func(x, y *Track, cols []string) bool {
 		for _, col := range cols {
-			switch col {
-			case "Title":
-				// <= ensures elem won't be swapped if has the same value as the elem it's
-				// compared to. The comparison is then made between secondary sort fields.
-				// Equivalent to if x.Title != y.Title.
-				return x.Title <= y.Title
-			case "Artist":
-				return x.Artist <= y.Artist
-			case "Album":
-				return x.Album <= y.Album
-			case "Year":
-				return x.Year <= y.Year
-			case "Length":
+			if col == "Title" && x.Title != y.Title {
+				return x.Title < y.Title
+			} else if col == "Artist" && x.Artist != y.Artist {
+				return x.Artist < y.Artist
+			} else if col == "Album" && x.Album != y.Album {
+				return x.Album < y.Album
+			} else if col == "Year" && x.Year != y.Year {
+				return x.Year < y.Year
+			} else if col == "Length" && x.Length != y.Length {
 				return x.Length <= y.Length
 			}
 		}
-		return false
+		return true
 	}})
 }
 
@@ -56,4 +53,11 @@ func Length(s string) time.Duration {
 		panic(s)
 	}
 	return d
+}
+
+func PrintTracks(tracks []*Track) {
+	for _, track := range tracks {
+		fmt.Printf("%+v\n", track)
+	}
+	fmt.Println()
 }

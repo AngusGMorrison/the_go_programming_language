@@ -5,7 +5,6 @@
 package main
 
 import (
-	"fmt"
 	"the_go_programming_language/ch7/cmd/ex8/track"
 )
 
@@ -20,25 +19,22 @@ var tracks = []*track.Track{
 func main() {
 	// No sort order specified
 	track.SortBy(tracks, []string{})
-	printTracks()
+	track.PrintTracks(tracks)
 
 	// Sort with title as the primary key
 	sortOrder := []string{"Title", "Artist", "Year"}
 	track.SortBy(tracks, sortOrder)
-	printTracks()
+	track.PrintTracks(tracks)
 
 	sortOrder = []string{"Artist", "Length"}
 	track.SortBy(tracks, sortOrder)
-	printTracks()
+	track.PrintTracks(tracks)
 
 	sortOrder = []string{"Artist", "Year", "Length"}
 	track.SortBy(tracks, sortOrder)
-	printTracks()
-}
+	track.PrintTracks(tracks)
 
-func printTracks() {
-	for _, track := range tracks {
-		fmt.Printf("%+v\n", track)
-	}
-	fmt.Println()
+	sortOrder = []string{"Artist", "Album"}
+	track.SortBy(tracks, sortOrder)
+	track.PrintTracks(tracks)
 }
