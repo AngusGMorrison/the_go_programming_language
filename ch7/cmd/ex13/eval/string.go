@@ -22,9 +22,9 @@ func (b binary) String() string {
 }
 
 func (c call) String() string {
-	args := []string{}
-	for _, arg := range c.args {
-		args = append(args, arg.String())
+	args := make([]string, len(c.args))
+	for i, arg := range c.args {
+		args[i] = arg.String()
 	}
 	return fmt.Sprintf("%s(%s)", c.fn, strings.Join(args, ", "))
 }
