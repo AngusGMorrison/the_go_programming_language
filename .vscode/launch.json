@@ -9,9 +9,9 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/ch7/cmd/ex16/webcalc",
+            "program": "${workspaceFolder}/ch7/cmd/ex18/xmlparser.go",
             "env": {},
-            "args": ["<", "create", "angusgmorrison", "the_go_programming_language"]
+            "args": ["<", "xml_sample.xml"]
         }
     ]
 }
