@@ -1,4 +1,8 @@
-// Example copied from https://github.com/kdama/gopl/blob/master/ch08/ex02/main.go
+// Implement a concurrent File Transfer Protocol (FTP) server. The server should interpret commands
+// from each client such as cd to change directory, ls to list a directory, get to send the contents
+// of a file, and close to close the connection.
+//
+// Thanks to Kdama for the solution that got me going https://github.com/kdama/gopl/blob/master/ch08/ex02/main.go
 package main
 
 import (
