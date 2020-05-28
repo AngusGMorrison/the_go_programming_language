@@ -20,7 +20,7 @@ var rootDir string
 
 func init() {
 	flag.IntVar(&port, "port", 8080, "port number")
-	flag.StringVar(&rootDir, "rootDir", ".", "root directory")
+	flag.StringVar(&rootDir, "rootDir", "public", "root directory")
 	flag.Parse()
 }
 
