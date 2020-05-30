@@ -40,4 +40,7 @@ func Serve(c *Conn) {
 			c.respond(status502)
 		}
 	}
+	if s.Err() != nil {
+		log.Print(s.Err())
+	}
 }
