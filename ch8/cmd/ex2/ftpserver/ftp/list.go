@@ -45,5 +45,4 @@ func (c *Conn) list(args []string) {
 	}
 
 	c.respond(status226)
-	return
 }
