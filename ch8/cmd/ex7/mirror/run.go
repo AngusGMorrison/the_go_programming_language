@@ -9,12 +9,12 @@ import (
 // Run crawls and downloads Mirror's host, mimicking its directory structure locally.
 func (m *Mirror) Run() error {
 	// Create root directory to save crawled pages to
-	if err := os.Mkdir(m.host, 0777); err != nil {
+	if err := os.Mkdir(m.rootDir, 0777); err != nil {
 		return fmt.Errorf("couldn't create dir %s: %v", m.rootDir, err)
 	}
 
 	var pending int                    // number of links waiting to be crawled
-	worklist := make(chan []*url.URL)  // lists of URLs received from crawlers; may have duplicates and non-host URLs
+	worklist := make(chan []*url.URL)  // lists of URLs received from crawlers; may have duplicates
 	unseenLinks := make(chan *url.URL) // de-duped URLs with the specified host
 
 	// Add starting URL to unseenLinks.
@@ -37,7 +37,7 @@ func (m *Mirror) Run() error {
 	for ; pending > 0; pending-- {
 		list := <-worklist
 		for _, link := range list {
-			if !seen[link] && link.Hostname() == m.host {
+			if !seen[link] {
 				seen[link] = true
 				pending++
 				unseenLinks <- link

@@ -19,12 +19,13 @@ var args []string
 func init() {
 	flag.StringVar(&rootDir, "root", "local", "mirror root directory")
 	flag.Uint64Var(&maxDownload, "maxDownload", 10240, "max download size (bytes)")
-	args = flag.Args()
 	flag.Parse()
+	args = flag.Args()
 }
 
 func main() {
-	if len(args) != 2 {
+	if len(args) != 1 {
+		fmt.Println(args)
 		fmt.Fprintf(os.Stderr, "usage: %s url\n", os.Args[0])
 		os.Exit(1)
 	}
