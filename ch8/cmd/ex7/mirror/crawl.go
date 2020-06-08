@@ -15,47 +15,33 @@ import (
 // crawl saves the page found at link and returns all links present on the page.
 func (m *Mirror) crawl(link *url.URL) []*url.URL {
 	fmt.Printf("Crawling %s...\n", link)
-	list, err := m.saveAndExtractLinks(link)
+
+	if !m.canDownload(link) {
+		return nil // skip page
+	}
+
+	page, err := getAndParse(link)
 	if err != nil {
 		log.Println(err)
 	}
-	return list
+
+	foundLinks := m.processLinks(page, link.Path)
+	m.save(link, page)
+	return foundLinks
 }
 
-// saveAndExtractLinks downloads valid pages to locations mirroring the host's directory structure,
-// and returns a list of URLs found on the page to the crawler.
-func (m *Mirror) saveAndExtractLinks(link *url.URL) ([]*url.URL, error) {
-	// If page is too large to download, skip it
+// canDownload returns false if the link is inaccessible or the page size exceeds m.maxDownload.
+func (m *Mirror) canDownload(link *url.URL) bool {
 	size, err := downloadSize(link)
 	if err != nil {
-		log.Printf("saving %s: %v\n", link, err)
+		log.Printf("sizing %s: %v\n", link, err)
+		return false
 	}
 	if size > m.maxDownload {
 		log.Printf("%s too large to download (%d B)\n", link, size)
-		return nil, nil
+		return false
 	}
-
-	resp, err := http.Get(link.String())
-	if err != nil {
-		return nil, fmt.Errorf("fetching %s: %v", link, err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("fetching %s: %s", link, resp.Status)
-	}
-
-	doc, err := html.Parse(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("parsing %q: %v", link, err)
-	}
-	resp.Body.Close() // Close body before writing new file to free fd
-
-	foundLinks, err := m.extractAndReplaceLinks(doc, link.Path)
-	if err != nil {
-		return foundLinks, fmt.Errorf("extracting links from %q: %v", link, err)
-	}
-	m.save(link, doc)
-	return foundLinks, nil
+	return true
 }
 
 // downloadSize returns the size of the requested resource without downloading it.
@@ -73,42 +59,67 @@ func downloadSize(link *url.URL) (uint64, error) {
 	return uint64(bytes), nil
 }
 
-// extractAndReplace links extracts all links in a tree of html Nodes and replaces them with links
-// to the equivalent mirrored page locally.
-func (m *Mirror) extractAndReplaceLinks(doc *html.Node, currentPath string) ([]*url.URL, error) {
-	var links []*url.URL
-	extractAndReplace := func(n *html.Node) {
-		if n.Type == html.ElementNode && n.Data == "a" {
-			for i, attr := range n.Attr {
-				if attr.Key != "href" {
-					continue
-				}
-
-				link, err := url.Parse(attr.Val)
-				if err != nil {
-					continue // ignore bad URLs
-				}
-				if !link.IsAbs() {
-					link.Scheme = m.startURL.Scheme
-					link.Host = m.host
-					if !strings.HasPrefix(link.Path, "/") {
-						link.Path = currentPath + link.Path
-					}
-				}
-
-				if link.Hostname() != m.host {
-					continue // ignore URLs outside host
-				}
-				links = append(links, link)
-				// Update links within m.host to refer to local copies
-				n.Attr[i].Val = m.buildLocalPath(link)
-			}
-		}
+// getAndParse downloads the specified URL and parses it into an *html.Node tree.
+func getAndParse(link *url.URL) (*html.Node, error) {
+	resp, err := http.Get(link.String())
+	if err != nil {
+		return nil, fmt.Errorf("fetching %s: %v", link, err)
 	}
-	forEachNode(doc, extractAndReplace)
-	return links, nil
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("fetching %s: %s", link, resp.Status)
+	}
+
+	page, err := html.Parse(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("parsing %q: %v", link, err)
+	}
+	return page, nil
 }
 
+// processLinks extracts all links in an *html.Node tree and replaces them with links to the
+// locally mirrored page before returning the originals.
+func (m *Mirror) processLinks(page *html.Node, currentPath string) []*url.URL {
+	var links []*url.URL
+	extractAndReplace := func(n *html.Node) {
+		if !(n.Type == html.ElementNode && n.Data == "a") {
+			return
+		}
+
+		for i, attr := range n.Attr {
+			if attr.Key != "href" {
+				continue
+			}
+			foundLink, err := url.Parse(attr.Val)
+			if err != nil {
+				continue // ignore bad URLs
+			}
+			if !foundLink.IsAbs() {
+				m.completeURL(foundLink, currentPath)
+			}
+			if foundLink.Hostname() != m.entrypoint.Host {
+				continue // ignore URLs outside host
+			}
+			links = append(links, foundLink)
+			// Update links within host domain to refer to local copies.
+			n.Attr[i].Val = m.buildLocalPath(foundLink)
+		}
+	}
+	forEachNode(page, extractAndReplace)
+	return links
+}
+
+// completeURL takes relative URLs and makes them absolute based on the Mirror's host
+func (m *Mirror) completeURL(link *url.URL, currentPath string) {
+	link.Scheme = m.entrypoint.Scheme
+	link.Host = m.entrypoint.Host
+	if !strings.HasPrefix(link.Path, "/") {
+		// If URL not relative to server root, include path of current page.
+		link.Path = currentPath + link.Path
+	}
+}
+
+// forEachNode iterates over an *html.Node tree and applies a function to each node.
 func forEachNode(n *html.Node, f func(n *html.Node)) {
 	f(n)
 	for c := n.FirstChild; c != nil; c = c.NextSibling {

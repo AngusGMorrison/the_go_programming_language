@@ -30,15 +30,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	startURL, err := url.Parse(args[0])
+	entrypoint, err := url.Parse(args[0])
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
-	m := mirror.New(startURL, maxDownload, rootDir)
-	err = m.Run()
-	if err != nil {
+	m := mirror.New(entrypoint, maxDownload, rootDir)
+	if err = m.Run(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
