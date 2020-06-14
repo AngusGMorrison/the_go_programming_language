@@ -74,43 +74,6 @@ func fmtConnectedClients(clients map[*client]bool) string {
 	return sb.String()
 }
 
-// func handleConn(conn net.Conn) {
-// 	cli := &client{
-// 		name: conn.RemoteAddr().String(),
-// 		ch:   make(chan string),
-// 		idle: time.NewTimer(timeout),
-// 	}
-// 	go clientWriter(conn, cli.ch)
-// 	go clientExpirer(conn, cli.idle)
-
-// 	cli.ch <- "You are " + cli.name
-// 	messages <- cli.name + " has arrived"
-// 	entering <- cli
-
-// 	input := bufio.NewScanner(conn)
-// 	for input.Scan() {
-// 		cli.idle.Stop()
-// 		cli.idle.Reset(timeout)
-// 		messages <- cli.name + ": " + input.Text()
-// 	}
-// 	// NOTE: ignoring potential errors from input.Err()
-
-// 	leaving <- cli
-// 	messages <- cli.name + " has left"
-// 	conn.Close()
-// }
-
-// func clientWriter(conn net.Conn, ch <-chan string) {
-// 	for msg := range ch {
-// 		fmt.Fprintln(conn, msg) // NOTE: ignoring network errors
-// 	}
-// }
-
-// func clientExpirer(conn net.Conn, idle *time.Timer) {
-// 	fmt.Println(<-idle.C)
-// 	conn.Close()
-// }
-
 func handleConn(conn net.Conn) {
 	cli := &client{
 		name: conn.RemoteAddr().String(),
