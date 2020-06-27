@@ -69,7 +69,7 @@ func TestCount(t *testing.T) {
 			wantInvalid: 0,
 		},
 		{
-			input: "a£�𐄂", // 127 is highest single-byte rune
+			input: "a£�𐄂", // 1, 2, 3 and 4-byte UTF-8 characters
 			wantCounts: map[rune]int{
 				'a': 1,
 				'£': 1,
