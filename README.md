@@ -1,2 +1,2 @@
-# the_go_programming_language
-Solutions for Donovan &amp; Kernighan's The Go Programming Language.
+# The Go Programming Language
+Solutions for Donovan &amp; Kernighan's _The Go Programming Language_.
